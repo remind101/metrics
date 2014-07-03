@@ -19,17 +19,17 @@ var root Namespace = ""
 
 // Count logs a count metric.
 func (n Namespace) Count(metric string, v interface{}) {
-	n.print(MetricCount, metric, v, "")
+	n.print(Counting, metric, v, "")
 }
 
 // Sample logs a sample metric.
 func (n Namespace) Sample(metric string, v interface{}, units string) {
-	n.print(MetricSample, metric, v, units)
+	n.print(Sampling, metric, v, units)
 }
 
 // Measure logs a measurement metric.
 func (n Namespace) Measure(metric string, v interface{}, units string) {
-	n.print(MetricMeasure, metric, v, units)
+	n.print(Measurement, metric, v, units)
 }
 
 // print prints a metric type to the logger.

@@ -16,7 +16,7 @@ type Timer struct {
 // NewTimer returns a new Timer.
 func NewTimer(metric string) *Timer {
 	return &Timer{
-		Metric: &Metric{Type: MetricMeasure, Name: metric, Units: "ms"},
+		Metric: &Metric{Type: Measurement, Name: metric, Units: "ms"},
 		Start:  time.Now(),
 	}
 }

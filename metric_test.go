@@ -8,11 +8,11 @@ func Test_Metric_String(t *testing.T) {
 		expected string
 	}{
 		{
-			&Metric{Name: "request.time", Type: MetricMeasure, Value: 120.12, Units: "ms"},
+			&Metric{Name: "request.time", Type: Measurement, Value: 120.12, Units: "ms"},
 			"measure#request.time=120.12ms",
 		},
 		{
-			&Metric{Name: "goroutine", Type: MetricCount, Value: 1},
+			&Metric{Name: "goroutine", Type: Counting, Value: 1},
 			"count#goroutine=1",
 		},
 	}

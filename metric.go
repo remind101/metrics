@@ -3,9 +3,9 @@ package metrics
 import "fmt"
 
 const (
-	MetricCount   MetricType = "count"
-	MetricSample  MetricType = "sample"
-	MetricMeasure MetricType = "measure"
+	Counting    MetricType = "count"
+	Sampling               = "sample"
+	Measurement            = "measure"
 )
 
 type MetricType string
