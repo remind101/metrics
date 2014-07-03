@@ -2,7 +2,7 @@ package metrics
 
 import "testing"
 
-func TestMetricString(t *testing.T) {
+func Test_Metric_String(t *testing.T) {
 	tests := []struct {
 		metric   *Metric
 		expected string

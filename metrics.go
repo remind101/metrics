@@ -55,3 +55,8 @@ func Sample(metric string, v interface{}, units string) {
 func Measure(metric string, v interface{}, units string) {
 	root.Measure(metric, v, units)
 }
+
+// Time starts a timer and returns it.
+func Time(metric string) *Timer {
+	return NewTimer(metric)
+}
