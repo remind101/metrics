@@ -1,6 +1,13 @@
 package metrics
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var (
+	ErrTimerStopped = errors.New("this timer has already been stopped")
+)
 
 type Timer struct {
 	// A Timer is a Metric.
@@ -11,6 +18,8 @@ type Timer struct {
 
 	// The time that this Timer ended.
 	End time.Time
+
+	stopped bool
 }
 
 // NewTimer returns a new Timer.
@@ -29,10 +38,17 @@ func (t *Timer) Duration() time.Duration {
 // Stop sets End on the Timer and calculates the value for the Metric.
 func (t *Timer) Stop() {
 	t.Value = t.Duration() * time.Millisecond
+	t.stopped = true
 }
 
 // Done stops the timer and prints it.
-func (t *Timer) Done() {
+func (t *Timer) Done() error {
+	if t.stopped {
+		return ErrTimerStopped
+	}
+
 	t.Stop()
 	t.Print()
+
+	return nil
 }
