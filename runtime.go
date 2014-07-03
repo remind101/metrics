@@ -31,9 +31,9 @@ func (r *RuntimeSample) Print() {
 
 // Runtime enters into a loop, sampling and outputing the runtime stats periodically.
 func Runtime() {
-	for {
+	c := time.Tick(5 * time.Second)
+	for _ = range c {
 		r := NewRuntimeSample()
 		r.Print()
-		time.Sleep(10000)
 	}
 }
