@@ -1,0 +1,16 @@
+language: go
+
+go:
+  - 1.2
+
+env:
+  - GOENV=test
+
+before_install:
+  - go install -a -race std
+  - go get github.com/tools/godep
+  - export PATH=$HOME/gopath/bin:$PATH
+  - godep get
+
+script:
+  - godep go test -race ./...
