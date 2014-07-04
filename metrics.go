@@ -16,24 +16,35 @@ var (
 
 // Count logs a count metric.
 func (n Namespace) Count(metric string, v interface{}) {
-	n.drain("count", metric, v, "")
+	n.drain("count", n.prefix(metric), v, "")
 }
 
 // Sample logs a sample metric.
 func (n Namespace) Sample(metric string, v interface{}, units string) {
-	n.drain("sample", metric, v, units)
+	n.drain("sample", n.prefix(metric), v, units)
 }
 
 // Measure logs a measurement metric.
 func (n Namespace) Measure(metric string, v interface{}, units string) {
-	n.drain("measure", metric, v, units)
+	n.drain("measure", n.prefix(metric), v, units)
+}
+
+// Time starts a timer and returns it.
+func (n Namespace) Time(metric string) *Timer {
+	return NewTimer(n.prefix(metric))
+}
+
+// prefix prefixes the namespace onto the metric name.
+func (n Namespace) prefix(metric string) string {
+	if n != "" {
+		return fmt.Sprintf("%s.%s", n, metric)
+	} else {
+		return metric
+	}
 }
 
 // drain drains the metric to the Drainer.
 func (n Namespace) drain(t, metric string, v interface{}, units string) {
-	if n != "" {
-		metric = fmt.Sprintf("%s.%s", n, metric)
-	}
 	m := &coreMetric{name: metric, typ: t, value: v, units: units}
 	Drain.Drain(m)
 }
@@ -55,5 +66,5 @@ func Measure(metric string, v interface{}, units string) {
 
 // Time starts a timer and returns it.
 func Time(metric string) *Timer {
-	return NewTimer(metric)
+	return root.Time(metric)
 }
