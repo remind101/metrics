@@ -7,17 +7,25 @@ A go library for printing metrics in an l2met compatible format.
 **Sampleing**
 
 ```go
-Sample("goroutine", 1, "")
+metrics.Sample("goroutine", 1, "")
 ```
 
 **Counting**
 
 ```go
-Count("user.signup", 1)
+metrics.Count("user.signup", 1)
 ```
 
 **Measuring**
 
 ```go
-Measure("request.time.2xx", 12.12, "ms")
+metrics.Measure("request.time.2xx", 12.12, "ms")
+```
+
+**Timing**
+
+```go
+t := metrics.Time("request.time")
+time.Sleep(1000)
+t.Done()
 ```
