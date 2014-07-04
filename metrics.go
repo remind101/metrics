@@ -2,43 +2,41 @@
 // to be output in the l2met format.
 package metrics
 
-import (
-	"fmt"
-	"log"
-	"os"
-)
+import "fmt"
 
 type Namespace string
 
-// Logger is the logger to use when printing metrics. By default, metrics are printed
-// to Stdout.
-var Logger = log.New(os.Stdout, "", 0)
+var (
+	// Logger is the logger to use when printing metrics. By default, metrics are printed
+	// to Stdout.
+	Drain Drainer = &LogDrain{}
 
-// The root namespace.
-var root Namespace = ""
+	// The root namespace.
+	root Namespace = ""
+)
 
 // Count logs a count metric.
 func (n Namespace) Count(metric string, v interface{}) {
-	n.print(Counting, metric, v, "")
+	n.print("count", metric, v, "")
 }
 
 // Sample logs a sample metric.
 func (n Namespace) Sample(metric string, v interface{}, units string) {
-	n.print(Sampling, metric, v, units)
+	n.print("sample", metric, v, units)
 }
 
 // Measure logs a measurement metric.
 func (n Namespace) Measure(metric string, v interface{}, units string) {
-	n.print(Measurement, metric, v, units)
+	n.print("measure", metric, v, units)
 }
 
 // print prints a metric type to the logger.
-func (n Namespace) print(t MetricType, metric string, v interface{}, units string) {
+func (n Namespace) print(t, metric string, v interface{}, units string) {
 	if n != "" {
 		metric = fmt.Sprintf("%s.%s", n, metric)
 	}
-	m := &Metric{Name: metric, Type: t, Value: v, Units: units}
-	m.Print()
+	m := &coreMetric{name: metric, typ: t, value: v, units: units}
+	Drain.Drain(m)
 }
 
 // Count logs a count metric in the root namespace.

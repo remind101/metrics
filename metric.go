@@ -1,35 +1,29 @@
 package metrics
 
-import "fmt"
+type Metric interface {
+	// Name returns the name of the metric (e.g. request.time.2xx)
+	Name() string
 
-const (
-	Counting    MetricType = "count"
-	Sampling               = "sample"
-	Measurement            = "measure"
-)
+	// Type returns the type of metric.
+	Type() string
 
-type MetricType string
+	// Value returns the value of the metric.
+	Value() interface{}
 
-type Metric struct {
-	// The name of the metric. (e.g. request.time.2xx)
-	Name string
-
-	// The type of metric.
-	Type MetricType
-
-	// The value of the metric.
-	Value interface{}
-
-	// The units of the metric.
-	Units string
+	// Units returns the units of the metric.
+	Units() string
 }
 
-// String returns the string representation of the metric in l2met format.
-func (m *Metric) String() string {
-	return fmt.Sprintf("%s#%s=%v%s", m.Type, m.Name, m.Value, m.Units)
+// coreMetric is a generic implementation of the Metric interface.
+type coreMetric struct {
+	name  string
+	typ   string
+	value interface{}
+	units string
 }
 
-// Print puts the metric onto stdout.
-func (m *Metric) Print() {
-	Logger.Println(m.String())
-}
+// Methods to implement the Metric interface
+func (m *coreMetric) Name() string       { return m.name }
+func (m *coreMetric) Type() string       { return m.typ }
+func (m *coreMetric) Value() interface{} { return m.value }
+func (m *coreMetric) Units() string      { return m.units }
