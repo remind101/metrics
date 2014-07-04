@@ -19,8 +19,8 @@ func NewRuntimeSample() *RuntimeSample {
 	return r
 }
 
-// Print prints the sample.
-func (r *RuntimeSample) Print() {
+// Drain drains all of the metrics.
+func (r *RuntimeSample) Drain() {
 	Sample("goroutine", r.NumGoroutine, "")
 	Sample("memory.allocated", r.MemStats.Alloc, "")
 	Sample("memory.mallocs", r.MemStats.Mallocs, "")
@@ -34,6 +34,6 @@ func Runtime() {
 	c := time.Tick(5 * time.Second)
 	for _ = range c {
 		r := NewRuntimeSample()
-		r.Print()
+		r.Drain()
 	}
 }
