@@ -7,8 +7,7 @@ import "fmt"
 type Namespace string
 
 var (
-	// Logger is the logger to use when printing metrics. By default, metrics are printed
-	// to Stdout.
+	// Drain is the Drainer that will be used to drain metrics.
 	Drain Drainer = &LogDrain{}
 
 	// The root namespace.
@@ -17,21 +16,21 @@ var (
 
 // Count logs a count metric.
 func (n Namespace) Count(metric string, v interface{}) {
-	n.print("count", metric, v, "")
+	n.drain("count", metric, v, "")
 }
 
 // Sample logs a sample metric.
 func (n Namespace) Sample(metric string, v interface{}, units string) {
-	n.print("sample", metric, v, units)
+	n.drain("sample", metric, v, units)
 }
 
 // Measure logs a measurement metric.
 func (n Namespace) Measure(metric string, v interface{}, units string) {
-	n.print("measure", metric, v, units)
+	n.drain("measure", metric, v, units)
 }
 
-// print prints a metric type to the logger.
-func (n Namespace) print(t, metric string, v interface{}, units string) {
+// drain drains the metric to the Drainer.
+func (n Namespace) drain(t, metric string, v interface{}, units string) {
 	if n != "" {
 		metric = fmt.Sprintf("%s.%s", n, metric)
 	}
