@@ -39,5 +39,5 @@ func (t *Timer) Stop() {
 // Done stops the timer and drains it.
 func (t *Timer) Done() {
 	t.Stop()
-	Drain.Drain(t)
+	drain(t)
 }

@@ -45,8 +45,7 @@ func (n Namespace) prefix(metric string) string {
 
 // drain drains the metric to the Drainer.
 func (n Namespace) drain(t, metric string, v interface{}, units string) {
-	m := &coreMetric{name: metric, typ: t, value: v, units: units}
-	Drain.Drain(m)
+	drain(&coreMetric{name: metric, typ: t, value: v, units: units})
 }
 
 // Count logs a count metric in the root namespace.
@@ -67,4 +66,9 @@ func Measure(metric string, v interface{}, units string) {
 // Time starts a timer and returns it.
 func Time(metric string) *Timer {
 	return root.Time(metric)
+}
+
+// drain drains the metric using the configured Drainer.
+func drain(m Metric) error {
+	return Drain.Drain(m)
 }
