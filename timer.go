@@ -21,14 +21,14 @@ func (t *Timer) Type() string  { return "measure" }
 func (t *Timer) Units() string { return "ms" }
 func (t *Timer) Value() interface{} {
 	if t.value == nil {
-		t.value = t.duration() * time.Millisecond
+		t.value = t.Milliseconds()
 	}
 	return t.value
 }
 
-// duration returns the duration between start and end.
-func (t *Timer) duration() time.Duration {
-	return t.end.Sub(t.start)
+// Milliseconds returns the number of milliseconds elapsed.
+func (t *Timer) Milliseconds() int64 {
+	return t.end.Sub(t.start).Nanoseconds() / int64(time.Millisecond)
 }
 
 // Stop stops the timer.
