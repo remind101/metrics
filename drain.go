@@ -19,7 +19,13 @@ type LogDrain struct {
 
 // Drain logs the metric to Stdout.
 func (d *LogDrain) Drain(m Metric) error {
-	d.logger().Println(fmt.Sprintf("%s#%s=%v%s", m.Type(), m.Name(), m.Value(), m.Units()))
+	s := fmt.Sprintf("%s#%s=%v%s", m.Type(), m.Name(), m.Value(), m.Units())
+
+	if Source != "" {
+		s = fmt.Sprintf("source=%s %s", Source, s)
+	}
+
+	d.logger().Println(s)
 	return nil
 }
 

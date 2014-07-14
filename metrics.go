@@ -2,13 +2,19 @@
 // to be output in the l2met format.
 package metrics
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 type Namespace string
 
 var (
 	// Drain is the Drainer that will be used to drain metrics.
 	Drain Drainer = &LogDrain{}
+
+	// The root source that these metrics are coming from.
+	Source = os.Getenv("DYNO")
 
 	// The root namespace.
 	root Namespace = ""
