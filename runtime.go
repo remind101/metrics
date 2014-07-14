@@ -22,11 +22,23 @@ func NewRuntimeSample() *RuntimeSample {
 // Drain drains all of the metrics.
 func (r *RuntimeSample) Drain() {
 	Sample("goroutine", r.NumGoroutine, "")
-	Sample("memory.allocated", r.MemStats.Alloc, "")
-	Sample("memory.mallocs", r.MemStats.Mallocs, "")
-	Sample("memory.frees", r.MemStats.Frees, "")
-	Sample("memory.heap", r.MemStats.HeapAlloc, "")
-	Sample("memory.stack", r.MemStats.StackInuse, "")
+	Sample("runtime.MemStats.Alloc", r.MemStats.Alloc, "")
+	Sample("runtime.MemStats.Frees", r.MemStats.Frees, "")
+	Sample("runtime.MemStats.HeapAlloc", r.MemStats.HeapAlloc, "")
+	Sample("runtime.MemStats.HeapIdle", r.MemStats.HeapIdle, "")
+	Sample("runtime.MemStats.HeapObjects", r.MemStats.HeapObjects, "")
+	Sample("runtime.MemStats.HeapReleased", r.MemStats.HeapReleased, "")
+	Sample("runtime.MemStats.HeapSys", r.MemStats.HeapSys, "")
+	Sample("runtime.MemStats.LastGC", r.MemStats.LastGC, "")
+	Sample("runtime.MemStats.Lookups", r.MemStats.Lookups, "")
+	Sample("runtime.MemStats.Mallocs", r.MemStats.Mallocs, "")
+	Sample("runtime.MemStats.MCacheInuse", r.MemStats.MCacheInuse, "")
+	Sample("runtime.MemStats.MCacheSys", r.MemStats.MCacheSys, "")
+	Sample("runtime.MemStats.MSpanInuse", r.MemStats.MSpanInuse, "")
+	Sample("runtime.MemStats.MSpanSys", r.MemStats.MSpanSys, "")
+	Sample("runtime.MemStats.NextGC", r.MemStats.NextGC, "")
+	Sample("runtime.MemStats.NumGC", r.MemStats.NumGC, "")
+	Sample("runtime.MemStats.StackInuse", r.MemStats.StackInuse, "")
 }
 
 // Runtime enters into a loop, sampling and outputing the runtime stats periodically.
