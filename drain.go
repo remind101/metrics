@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/remind101/metrics/_vendor/g2s"
+	"github.com/remind101/metrics/vendor/g2s"
 )
 
 // Insure interfaces are implemented.
