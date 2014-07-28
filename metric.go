@@ -1,5 +1,6 @@
 package metrics
 
+// Metric is the interface that represents a metric.
 type Metric interface {
 	// Name returns the name of the metric (e.g. request.time.2xx)
 	Name() string
