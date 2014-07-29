@@ -65,12 +65,18 @@ func NewStatsDrain(endpoint string) *StatsDrain {
 
 // Drain drains the metrics to StatsD.
 func (d *StatsDrain) Drain(m Metric) error {
+	name := m.Name()
+
+	if Source != "" {
+		name = fmt.Sprintf("%s.%s", Source, name)
+	}
+
 	switch m.Type() {
 	case "sample", "measure":
-		d.statter.Gauge(1.0, m.Name(), fmt.Sprintf("%v", m.Value()))
+		d.statter.Gauge(1.0, name, fmt.Sprintf("%v", m.Value()))
 	case "count":
 		if value, ok := m.Value().(int); ok {
-			d.statter.Counter(1.0, m.Name(), value)
+			d.statter.Counter(1.0, name, value)
 		}
 	default:
 	}
