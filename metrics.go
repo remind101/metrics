@@ -10,8 +10,10 @@ import (
 type Namespace string
 
 var (
+	DefaultLogDrain = &LogDrain{}
+
 	// Drain is the Drainer that will be used to drain metrics.
-	Drain Drainer = &LogDrain{}
+	Drain Drainer = DefaultLogDrain
 
 	// The root source that these metrics are coming from.
 	Source = os.Getenv("DYNO")
