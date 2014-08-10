@@ -6,12 +6,18 @@ import (
 	"os"
 )
 
-// Drain is an interface that can drain a metric to it's output.
+// Ensure implementations implement the Drain interface.
+var (
+	_ Drainer = &LogDrain{}
+	_ Drainer = &NullDrain{}
+)
+
+// Drainer is an interface that can drain a metric to it's output.
 type Drainer interface {
 	Drain(Metric) error
 }
 
-// LogDrain is a Drain implementation that logs the metrics to Stdout in
+// LogDrain is a Drainer implementation that logs the metrics to Stdout in
 // l2met format.
 type LogDrain struct {
 	Logger *log.Logger
@@ -35,3 +41,9 @@ func (d *LogDrain) logger() *log.Logger {
 	}
 	return d.Logger
 }
+
+// NullDrain is a Drain implementation that does nothing.
+type NullDrain struct{}
+
+// Drain implements the Drainer interface.
+func (d *NullDrain) Drain(m Metric) error { return nil }
