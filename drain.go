@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// Ensure implementations implement the Drain interface.
+// Ensure implementations implement the Drainer interface.
 var (
 	_ Drainer = &LogDrain{}
 	_ Drainer = &NullDrain{}
@@ -42,7 +42,7 @@ func (d *LogDrain) logger() *log.Logger {
 	return d.Logger
 }
 
-// NullDrain is a Drain implementation that does nothing.
+// NullDrain is a Drainer implementation that does nothing.
 type NullDrain struct{}
 
 // Drain implements the Drainer interface.
