@@ -11,8 +11,8 @@ import (
 type Namespace string
 
 var (
-	// Drain is the Drainer that will be used to drain metrics.
-	Drain = Drainer(&LogDrain{})
+	// DefaultDrain is the Drainer that will be used to drain metrics.
+	DefaultDrain = Drainer(&LogDrain{})
 
 	// Source is the root source that these metrics are coming from.
 	Source = os.Getenv("DYNO")
@@ -22,19 +22,39 @@ var (
 	DefaultNamespace Namespace
 )
 
-// Count logs a count metric.
+// NewMetric returns a new Metric.
+func (n Namespace) NewMetric(t, name string, v interface{}, units string) Metric {
+	return &metric{name: n.prefix(name), typ: t, value: v, units: units}
+}
+
+// CountMetric returns a new Metric for a count.
+func (n Namespace) CountMetric(name string, v interface{}) Metric {
+	return n.NewMetric("count", name, v, "")
+}
+
+// Count creates a count metric and drains it.
 func (n Namespace) Count(name string, v interface{}) {
-	n.drain("count", n.prefix(name), v, "")
+	drain(n.CountMetric(name, v))
 }
 
-// Sample logs a sample metric.
+// SampleMetric returns a new Metric for a sample.
+func (n Namespace) SampleMetric(name string, v interface{}, units string) Metric {
+	return n.NewMetric("sample", name, v, units)
+}
+
+// Sample creates a sample metric and drains it.
 func (n Namespace) Sample(name string, v interface{}, units string) {
-	n.drain("sample", n.prefix(name), v, units)
+	drain(n.SampleMetric(name, v, units))
 }
 
-// Measure logs a measurement metric.
+// MeasureMetric returns a new Metric for a measure.
+func (n Namespace) MeasureMetric(name string, v interface{}, units string) Metric {
+	return n.NewMetric("measure", name, v, units)
+}
+
+// Measure creates a measure metric and drains it.
 func (n Namespace) Measure(name string, v interface{}, units string) {
-	n.drain("measure", n.prefix(name), v, units)
+	drain(n.MeasureMetric(name, v, units))
 }
 
 // Time starts a timer and returns it.
@@ -49,11 +69,6 @@ func (n Namespace) prefix(name string) string {
 	}
 
 	return name
-}
-
-// drain drains the metric to the Drainer.
-func (n Namespace) drain(t, name string, v interface{}, units string) {
-	drain(&metric{name: name, typ: t, value: v, units: units})
 }
 
 // Count logs a count metric in the root namespace.
@@ -78,5 +93,5 @@ func Time(name string) *Timer {
 
 // drain drains the metric using the configured Drainer.
 func drain(m Metric) error {
-	return Drain.Drain(m)
+	return DefaultDrain.Drain(m)
 }
