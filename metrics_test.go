@@ -1,17 +1,32 @@
 package metrics
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-func TestCount(t *testing.T) {
+func init() {
+	Drain.(*LogDrain).DrainFunc = func(s string) {
+		fmt.Println(s)
+	}
+}
+
+func ExampleCount() {
 	Count("user.signup", 1)
+	// Output:
+	// count#user.signup=1
 }
 
-func TestSample(t *testing.T) {
+func ExampleSample() {
 	Sample("goroutine", 1, "")
+	// Output:
+	// sample#goroutine=1
 }
 
-func TestMeasure(t *testing.T) {
+func ExampleMeasure() {
 	Measure("request.time.2xx", 12.14, "ms")
+	// Output:
+	// measure#request.time.2xx=12.14ms
 }
 
 func TestTime(t *testing.T) {

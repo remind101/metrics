@@ -1,5 +1,7 @@
 package metrics
 
+// Metric represents an individual count/sample/measurement and encapsulates information
+// about it.
 type Metric interface {
 	// Name returns the name of the metric (e.g. request.time.2xx)
 	Name() string
@@ -14,8 +16,8 @@ type Metric interface {
 	Units() string
 }
 
-// coreMetric is a generic implementation of the Metric interface.
-type coreMetric struct {
+// metric is a generic implementation of the Metric interface.
+type metric struct {
 	name  string
 	typ   string
 	value interface{}
@@ -23,7 +25,7 @@ type coreMetric struct {
 }
 
 // Methods to implement the Metric interface
-func (m *coreMetric) Name() string       { return m.name }
-func (m *coreMetric) Type() string       { return m.typ }
-func (m *coreMetric) Value() interface{} { return m.value }
-func (m *coreMetric) Units() string      { return m.units }
+func (m *metric) Name() string       { return m.name }
+func (m *metric) Type() string       { return m.typ }
+func (m *metric) Value() interface{} { return m.value }
+func (m *metric) Units() string      { return m.units }
