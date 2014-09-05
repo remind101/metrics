@@ -4,26 +4,29 @@ import "time"
 
 // Timer is an implementation of the Metric interface for timing things.
 type Timer struct {
-	name  string
+	*metric
 	start time.Time
 	end   time.Time
-	value interface{}
 }
 
 // NewTimer returns a new Timer metric.
-func NewTimer(metric string) *Timer {
-	return &Timer{name: metric, start: time.Now()}
+func NewTimer(name string) *Timer {
+	return &Timer{
+		metric: &metric{
+			name:  name,
+			typ:   "measure",
+			units: "ms",
+		},
+		start: time.Now(),
+	}
 }
 
-// Methods to implement the Metric interface
-func (t *Timer) Name() string  { return t.name }
-func (t *Timer) Type() string  { return "measure" }
-func (t *Timer) Units() string { return "ms" }
+// Value returns the difference between start and end in milliseconds.
 func (t *Timer) Value() interface{} {
-	if t.value == nil {
-		t.value = t.Milliseconds()
+	if t.metric.value == nil {
+		t.metric.value = t.Milliseconds()
 	}
-	return t.value
+	return t.metric.value
 }
 
 // Milliseconds returns the number of milliseconds elapsed.
