@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"fmt"
-	"testing"
+	"time"
 )
 
 func init() {
@@ -29,7 +29,12 @@ func ExampleMeasure() {
 	// measure#request.time.2xx=12.14ms
 }
 
-func TestTime(t *testing.T) {
-	timer := Time("request.time")
-	timer.Done()
+func ExampleTime() {
+	t := Time("request.time")
+	t.NowFunc = func() time.Time {
+		return t.start.Add(527 * time.Millisecond)
+	}
+	t.Done()
+	// Output:
+	// measure#request.time=527ms
 }
