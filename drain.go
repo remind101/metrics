@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"fmt"
 	"log"
 	"os"
 )
@@ -20,19 +19,36 @@ type Drainer interface {
 // LogDrain is a Drainer implementation that logs the metrics to Stdout in
 // l2met format.
 type LogDrain struct {
-	Logger *log.Logger
+	// Formatter to use to format the metric into a string before outputting.
+	Formatter Formatter
+
+	DrainFunc func(string)
+	Logger    *log.Logger
 }
 
 // Drain logs the metric to Stdout.
 func (d *LogDrain) Drain(m Metric) error {
-	s := fmt.Sprintf("%s#%s=%v%s", m.Type(), m.Name(), m.Value(), m.Units())
+	s := d.formatter().Format(m)
+	d.drain(s)
+	return nil
+}
 
-	if Source != "" {
-		s = fmt.Sprintf("source=%s %s", Source, s)
+func (d *LogDrain) drain(s string) {
+	if d.DrainFunc == nil {
+		d.DrainFunc = func(s string) {
+			d.logger().Println(s)
+		}
 	}
 
-	d.logger().Println(s)
-	return nil
+	d.DrainFunc(s)
+}
+
+func (d *LogDrain) formatter() Formatter {
+	if d.Formatter == nil {
+		d.Formatter = DefaultFormatter
+	}
+
+	return d.Formatter
 }
 
 func (d *LogDrain) logger() *log.Logger {
