@@ -43,7 +43,12 @@ func (r *RuntimeSample) Drain() {
 
 // Runtime enters into a loop, sampling and outputing the runtime stats periodically.
 func Runtime() {
-	c := time.Tick(5 * time.Second)
+	SampleEvery(5 * time.Second)
+}
+
+// SampleEvery enters a loop, sampling at the specified interval
+func SampleEvery(t time.Duration) {
+	c := time.Tick(t)
 	for _ = range c {
 		r := NewRuntimeSample()
 		r.Drain()
