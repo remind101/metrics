@@ -41,9 +41,18 @@ func (r *RuntimeSample) Drain() {
 	Sample("runtime.MemStats.StackInuse", r.MemStats.StackInuse, "")
 }
 
+// DefaultInterval sets how often the metrics Runtime will sample and
+// emit stats.
+var DefaultInterval time.Duration = 30 * time.Second
+
 // Runtime enters into a loop, sampling and outputing the runtime stats periodically.
 func Runtime() {
-	c := time.Tick(5 * time.Second)
+	SampleEvery(DefaultInterval)
+}
+
+// SampleEvery enters a loop, sampling at the specified interval
+func SampleEvery(t time.Duration) {
+	c := time.Tick(t)
 	for _ = range c {
 		r := NewRuntimeSample()
 		r.Drain()
