@@ -63,3 +63,33 @@ type NullDrain struct{}
 
 // Drain implements the Drainer interface.
 func (d *NullDrain) Drain(m Metric) error { return nil }
+
+type LocalStoreDrain struct {
+	LogDrain
+	store map[string]map[string]int
+}
+
+// Drain records metrics to the local store. For a given key, we'll generate a
+// map[string]int which aggregates the entries which would typically be logged
+// by the LogDrain. This helps verify metrics are being recorded in tests.
+func (d *LocalStoreDrain) Drain(m Metric) error {
+	s := d.formatter().Format(m)
+	if kmap, ok := d.store[m.Name()]; ok {
+		if value, ok := kmap[s]; ok {
+			kmap[s] = value + 1
+		} else {
+			kmap[s] = 1
+		}
+	} else {
+		kmap := make(map[string]int)
+		kmap[s] = 1
+		d.store[m.Name()] = kmap
+	}
+	return nil
+}
+
+func NewLocalStoreDrain() *LocalStoreDrain {
+	d := LocalStoreDrain{}
+	d.store = make(map[string]map[string]int)
+	return &d
+}
