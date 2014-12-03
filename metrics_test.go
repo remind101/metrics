@@ -7,12 +7,12 @@ import (
 
 func TestLocalStoreDrain(t *testing.T) {
 	original := metrics.DefaultDrain
-	metrics.DefaultDrain = metrics.NewLocalStoreDrain()
+	metrics.DefaultDrain = &metrics.LocalStoreDrain{}
 	defer func() {
 		metrics.DefaultDrain = original
 	}()
 
-	store := metrics.DefaultDrain.(*metrics.LocalStoreDrain).Store
+	store := metrics.DefaultDrain.(*metrics.LocalStoreDrain).Store()
 	const key = "user.signup"
 
 	// increment our key twice
