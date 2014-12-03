@@ -63,3 +63,24 @@ type NullDrain struct{}
 
 // Drain implements the Drainer interface.
 func (d *NullDrain) Drain(m Metric) error { return nil }
+
+type LocalStoreDrain struct {
+	store map[string][]Metric
+}
+
+func (d *LocalStoreDrain) Store() map[string][]Metric {
+	if d.store == nil {
+		d.store = make(map[string][]Metric)
+	}
+	return d.store
+}
+
+// Drain records metrics to the local store.
+func (d *LocalStoreDrain) Drain(m Metric) error {
+	var metrics []Metric
+	if existingMetrics, ok := d.Store()[m.Name()]; ok {
+		metrics = existingMetrics
+	}
+	d.Store()[m.Name()] = append(metrics, m)
+	return nil
+}
