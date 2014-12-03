@@ -75,6 +75,12 @@ func (d *LocalStoreDrain) Store() map[string][]Metric {
 	return d.store
 }
 
+func (d *LocalStoreDrain) Flush() {
+	if d.store != nil {
+		d.store = nil
+	}
+}
+
 // Drain records metrics to the local store.
 func (d *LocalStoreDrain) Drain(m Metric) error {
 	var metrics []Metric
