@@ -65,31 +65,23 @@ type NullDrain struct{}
 func (d *NullDrain) Drain(m Metric) error { return nil }
 
 type LocalStoreDrain struct {
-	LogDrain
-	store map[string]map[string]int
+	Store map[string][]Metric
 }
 
 // Drain records metrics to the local store. For a given key, we'll generate a
 // map[string]int which aggregates the entries which would typically be logged
 // by the LogDrain. This helps verify metrics are being recorded in tests.
 func (d *LocalStoreDrain) Drain(m Metric) error {
-	s := d.formatter().Format(m)
-	if kmap, ok := d.store[m.Name()]; ok {
-		if value, ok := kmap[s]; ok {
-			kmap[s] = value + 1
-		} else {
-			kmap[s] = 1
-		}
-	} else {
-		kmap := make(map[string]int)
-		kmap[s] = 1
-		d.store[m.Name()] = kmap
+	var metrics []Metric
+	if existingMetrics, ok := d.Store[m.Name()]; ok {
+		metrics = existingMetrics
 	}
+	d.Store[m.Name()] = append(metrics, m)
 	return nil
 }
 
 func NewLocalStoreDrain() *LocalStoreDrain {
 	d := LocalStoreDrain{}
-	d.store = make(map[string]map[string]int)
+	d.Store = make(map[string][]Metric)
 	return &d
 }
