@@ -5,12 +5,17 @@ import (
 	"testing"
 )
 
-func TestLocalStoreDrain(t *testing.T) {
+func setMetricsDrain(d metrics.Drainer) func() {
 	original := metrics.DefaultDrain
-	metrics.DefaultDrain = &metrics.LocalStoreDrain{}
-	defer func() {
+	metrics.DefaultDrain = d
+	return func() {
 		metrics.DefaultDrain = original
-	}()
+	}
+}
+
+func TestLocalStoreDrain(t *testing.T) {
+	cleanup := setMetricsDrain(&metrics.LocalStoreDrain{})
+	defer cleanup()
 
 	store := metrics.DefaultDrain.(*metrics.LocalStoreDrain).Store()
 	const key = "user.signup"
@@ -62,4 +67,21 @@ func TestLocalStoreDrain(t *testing.T) {
 			"got", metricsMap["measure"],
 		)
 	}
+}
+
+func TestLocalStoreDrainFlush(t *testing.T) {
+	cleanup := setMetricsDrain(&metrics.LocalStoreDrain{})
+	defer cleanup()
+	const key = "key"
+
+	metrics.Count(key, 1)
+	if len(metrics.DefaultDrain.(*metrics.LocalStoreDrain).Store()) != 1 {
+		t.Error("Error recording metric")
+	}
+
+	metrics.DefaultDrain.(*metrics.LocalStoreDrain).Flush()
+	if len(metrics.DefaultDrain.(*metrics.LocalStoreDrain).Store()[key]) != 0 {
+		t.Error("Error flushing LocalStoreDrain")
+	}
+
 }
