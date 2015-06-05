@@ -6,6 +6,7 @@ import (
 )
 
 func init() {
+	Source = ""
 	DefaultDrain.(*LogDrain).DrainFunc = func(s string) {
 		fmt.Println(s)
 	}
