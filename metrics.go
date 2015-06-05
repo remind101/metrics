@@ -15,12 +15,21 @@ var (
 	DefaultDrain = Drainer(&LogDrain{})
 
 	// Source is the root source that these metrics are coming from.
-	Source = os.Getenv("DYNO")
+	Source string
 
 	// DefaultNamespace is the default namespace to output metrics. By default,
 	// no namespace.
 	DefaultNamespace Namespace
 )
+
+func init() {
+	hostname, _ := os.Hostname()
+	prefix := os.Getenv("SOURCE")
+	if prefix == "" {
+		prefix = os.Getenv("DYNO")
+	}
+	Source = fmt.Sprintf("%s.%s", prefix, hostname)
+}
 
 // NewMetric returns a new Metric.
 func (n Namespace) NewMetric(t, name string, v interface{}, units string) Metric {
