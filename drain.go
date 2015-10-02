@@ -96,9 +96,11 @@ func (d *LocalStoreDrain) Drain(m Metric) error {
 	return nil
 }
 
-var ValueInvalidErr = errors.New("value must be one of [int, uint, int32, uint32, int64, uint64]")
-var ValueOverflowErr = errors.New("value for uint64 too large to be converted to int64")
-var InvalidMetricTypeErr = errors.New("metric type must be one of [count, sample, measure]")
+var (
+	ValueInvalidErr      = errors.New("value must be one of [int, uint, int32, uint32, int64, uint64]")
+	ValueOverflowErr     = errors.New("value for uint64 too large to be converted to int64")
+	InvalidMetricTypeErr = errors.New("metric type must be one of [count, sample, measure]")
+)
 
 type StatsdClient interface {
 	Incr(name string, count int64) error
