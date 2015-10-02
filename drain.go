@@ -149,10 +149,24 @@ func (d *StatsdDrain) Drain(m Metric) error {
 	}
 }
 
+// templateData is used to render metric names from the StatsdDrain template.
+type templateData struct {
+	Name   string
+	Type   string
+	Units  string
+	Source string
+}
+
 // name constructs a metric name with the StatsdDrain template.
 func (d *StatsdDrain) name(m Metric) (string, error) {
 	b := new(bytes.Buffer)
-	if err := d.template.Execute(b, m); err != nil {
+	data := templateData{
+		Name:   m.Name(),
+		Type:   m.Type(),
+		Units:  m.Units(),
+		Source: Source,
+	}
+	if err := d.template.Execute(b, data); err != nil {
 		return "", err
 	}
 	return b.String(), nil

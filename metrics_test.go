@@ -15,6 +15,14 @@ func setMetricsDrain(d metrics.Drainer) func() {
 	}
 }
 
+func setMetricsSource(s string) func() {
+	original := metrics.Source
+	metrics.Source = s
+	return func() {
+		metrics.Source = original
+	}
+}
+
 func TestLocalStoreDrain(t *testing.T) {
 	cleanup := setMetricsDrain(&metrics.LocalStoreDrain{})
 	defer cleanup()
@@ -137,13 +145,16 @@ func (c *MockStatsdClient) Timing(n string, v int64) error {
 func TestStatsdDrain(t *testing.T) {
 	mc := &MockStatsdClient{}
 
-	d, err := metrics.NewStatsdDrain(mc, "{{.Name}}.source__test__")
+	d, err := metrics.NewStatsdDrain(mc, "{{.Name}}.source__{{.Source}}__")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cleanup := setMetricsDrain(d)
-	defer cleanup()
+	drainCleanup := setMetricsDrain(d)
+	defer drainCleanup()
+
+	sourceCleanup := setMetricsSource("test")
+	defer sourceCleanup()
 
 	mc.IncrFunc = expect(t, "requests.count.source__test__", 5)
 	metrics.Count("requests.count", 5)
