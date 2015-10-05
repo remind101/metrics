@@ -1,8 +1,10 @@
 package metrics_test
 
 import (
-	metrics "."
+	"errors"
 	"testing"
+
+	metrics "."
 )
 
 func setMetricsDrain(d metrics.Drainer) func() {
@@ -10,6 +12,14 @@ func setMetricsDrain(d metrics.Drainer) func() {
 	metrics.DefaultDrain = d
 	return func() {
 		metrics.DefaultDrain = original
+	}
+}
+
+func setMetricsSource(s string) func() {
+	original := metrics.Source
+	metrics.Source = s
+	return func() {
+		metrics.Source = original
 	}
 }
 
@@ -84,4 +94,77 @@ func TestLocalStoreDrainFlush(t *testing.T) {
 		t.Error("Error flushing LocalStoreDrain")
 	}
 
+}
+
+var UnexpectedFuncCall = errors.New("unexpected function call")
+
+type stub func(string, int64) error
+
+var expect = func(t *testing.T, en string, ev int64) stub {
+	return func(n string, v int64) error {
+		if got, want := n, en; got != want {
+			t.Errorf("metric name: expected %q; got %q", got, want)
+		}
+		if got, want := v, ev; got != want {
+			t.Errorf("metric value: expected %q; got %q", got, want)
+		}
+		return nil
+	}
+}
+
+type MockStatsdClient struct {
+	IncrFunc   stub
+	GaugeFunc  stub
+	TimingFunc stub
+}
+
+func (c *MockStatsdClient) Incr(n string, v int64) error {
+	if c.IncrFunc != nil {
+		return c.IncrFunc(n, v)
+	} else {
+		return UnexpectedFuncCall
+	}
+}
+
+func (c *MockStatsdClient) Gauge(n string, v int64) error {
+	if c.GaugeFunc != nil {
+		return c.GaugeFunc(n, v)
+	} else {
+		return UnexpectedFuncCall
+	}
+}
+
+func (c *MockStatsdClient) Timing(n string, v int64) error {
+	if c.TimingFunc != nil {
+		return c.TimingFunc(n, v)
+	} else {
+		return UnexpectedFuncCall
+	}
+}
+
+func TestStatsdDrain(t *testing.T) {
+	mc := &MockStatsdClient{}
+
+	d, err := metrics.NewStatsdDrain(mc, "{{.Name}}.source__{{.Source}}__")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	drainCleanup := setMetricsDrain(d)
+	defer drainCleanup()
+
+	sourceCleanup := setMetricsSource("test")
+	defer sourceCleanup()
+
+	mc.IncrFunc = expect(t, "requests.count.source__test__", 5)
+	metrics.Count("requests.count", 5)
+
+	mc.GaugeFunc = expect(t, "requests.sample.source__test__", 50)
+	metrics.Sample("requests.sample", 50, "")
+
+	mc.GaugeFunc = expect(t, "requests.measure.source__test__", 500)
+	metrics.Measure("requests.measure", 500, "")
+
+	mc.TimingFunc = expect(t, "requests.timing.source__test__", 5000)
+	metrics.Measure("requests.timing", 5000, "ms")
 }
