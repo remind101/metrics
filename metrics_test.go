@@ -2,6 +2,7 @@ package metrics_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	metrics "."
@@ -103,10 +104,10 @@ type stub func(string, int64) error
 var expect = func(t *testing.T, en string, ev int64) stub {
 	return func(n string, v int64) error {
 		if got, want := n, en; got != want {
-			t.Errorf("metric name: expected %q; got %q", got, want)
+			return fmt.Errorf("metric name: expected %s; got %s", got, want)
 		}
 		if got, want := v, ev; got != want {
-			t.Errorf("metric value: expected %q; got %q", got, want)
+			return fmt.Errorf("metric value: expected %d; got %d", got, want)
 		}
 		return nil
 	}
@@ -157,14 +158,21 @@ func TestStatsdDrain(t *testing.T) {
 	defer sourceCleanup()
 
 	mc.IncrFunc = expect(t, "requests.count.source__test__", 5)
-	metrics.Count("requests.count", 5)
-
+	if err := metrics.Count("requests.count", 5); err != nil {
+		t.Error(err)
+	}
 	mc.GaugeFunc = expect(t, "requests.sample.source__test__", 50)
-	metrics.Sample("requests.sample", 50, "")
+	if err := metrics.Sample("requests.sample", 50, ""); err != nil {
+		t.Error(err)
+	}
 
 	mc.GaugeFunc = expect(t, "requests.measure.source__test__", 500)
-	metrics.Measure("requests.measure", 500, "")
+	if err := metrics.Measure("requests.measure", 500, ""); err != nil {
+		t.Error(err)
+	}
 
 	mc.TimingFunc = expect(t, "requests.timing.source__test__", 5000)
-	metrics.Measure("requests.timing", 5000, "ms")
+	if err := metrics.Measure("requests.timing", 500, "ms"); err != nil {
+		t.Error(err)
+	}
 }
