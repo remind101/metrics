@@ -172,7 +172,12 @@ func TestStatsdDrain(t *testing.T) {
 	}
 
 	mc.TimingFunc = expect(t, "requests.timing.source__test__", 5000)
-	if err := metrics.Measure("requests.timing", 500, "ms"); err != nil {
+	if err := metrics.Measure("requests.timing", 5000, "ms"); err != nil {
+		t.Error(err)
+	}
+
+	mc.TimingFunc = expect(t, "requests.timing.source__test__", 101)
+	if err := metrics.Measure("requests.timing", 100.925, "ms"); err != nil {
 		t.Error(err)
 	}
 }

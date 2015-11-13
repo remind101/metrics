@@ -194,6 +194,8 @@ func vtoi(v interface{}) (int64, error) {
 		} else {
 			return 0, ValueOverflowErr
 		}
+	case float64:
+		return int64(math.Ceil(i)), nil
 	default:
 		return 0, ValueInvalidErr
 	}
