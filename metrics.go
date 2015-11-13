@@ -81,18 +81,18 @@ func (n Namespace) prefix(name string) string {
 }
 
 // Count logs a count metric in the root namespace.
-func Count(name string, v interface{}) {
-	DefaultNamespace.Count(name, v)
+func Count(name string, v interface{}) error {
+	return DefaultNamespace.Count(name, v)
 }
 
 // Sample logs a sample metric in the root namespace.
-func Sample(name string, v interface{}, units string) {
-	DefaultNamespace.Sample(name, v, units)
+func Sample(name string, v interface{}, units string) error {
+	return DefaultNamespace.Sample(name, v, units)
 }
 
 // Measure logs a measurement metric in the root namespace.
-func Measure(name string, v interface{}, units string) {
-	DefaultNamespace.Measure(name, v, units)
+func Measure(name string, v interface{}, units string) error {
+	return DefaultNamespace.Measure(name, v, units)
 }
 
 // Time starts a timer and returns it.
