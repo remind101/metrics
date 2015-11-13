@@ -41,19 +41,9 @@ func (n Namespace) CountMetric(name string, v interface{}) Metric {
 	return n.NewMetric("count", name, v, "")
 }
 
-// Count creates a count metric and drains it.
-func (n Namespace) Count(name string, v interface{}) {
-	drain(n.CountMetric(name, v))
-}
-
 // SampleMetric returns a new Metric for a sample.
 func (n Namespace) SampleMetric(name string, v interface{}, units string) Metric {
 	return n.NewMetric("sample", name, v, units)
-}
-
-// Sample creates a sample metric and drains it.
-func (n Namespace) Sample(name string, v interface{}, units string) {
-	drain(n.SampleMetric(name, v, units))
 }
 
 // MeasureMetric returns a new Metric for a measure.
@@ -61,14 +51,24 @@ func (n Namespace) MeasureMetric(name string, v interface{}, units string) Metri
 	return n.NewMetric("measure", name, v, units)
 }
 
-// Measure creates a measure metric and drains it.
-func (n Namespace) Measure(name string, v interface{}, units string) {
-	drain(n.MeasureMetric(name, v, units))
-}
-
 // Time starts a timer and returns it.
 func (n Namespace) Time(name string) *Timer {
 	return NewTimer(n.prefix(name))
+}
+
+// Count creates a count metric and drains it.
+func (n Namespace) Count(name string, v interface{}) error {
+	return drain(n.CountMetric(name, v))
+}
+
+// Sample creates a sample metric and drains it.
+func (n Namespace) Sample(name string, v interface{}, units string) error {
+	return drain(n.SampleMetric(name, v, units))
+}
+
+// Measure creates a measure metric and drains it.
+func (n Namespace) Measure(name string, v interface{}, units string) error {
+	return drain(n.MeasureMetric(name, v, units))
 }
 
 // prefix prefixes the namespace onto the metric name.
